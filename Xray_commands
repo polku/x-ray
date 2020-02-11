@@ -57,6 +57,14 @@ cloc .  --quiet
 https://gbayer.com/development/moving-files-from-one-git-repository-to-another-preserving-history/
 
 
+# Voir l'évolution d'une fonction
+# We want to analyze snapshots of the repo
+# 1. Identify a relevant commit
+git checkout `git rev-list -1 --before="Jan 01 2016" master --format=oneline | awk '{print $1;}'`
+
+# 2. Analysis
+https://radon.readthedocs.io/en/latest/api.html
+radon cc -s src/service/NewPersonManagement.py | grep update_customer | awk '{ print $6 }'
 
 
 # Code maat
