@@ -44,7 +44,7 @@ git blame --line-porcelain src/service/AccessLinkManagement.py | sed -n 's/^comm
 # Sur AccessLinkManagement il y a beaucoup de commits récents pour rendre le fichier compatible avec black, donc du lint et ça fausse les résultats
 # mais git blame accepte un commit comme argument comme fe25b6d (ou fe25b6d^ pour dire le parent de fe25b6d) donc on peut se placer avant ça
 
-# change coupling
+
 
 # code similarity between functions
 
@@ -65,6 +65,11 @@ git checkout `git rev-list -1 --before="Jan 01 2016" master --format=oneline | a
 # 2. Analysis
 https://radon.readthedocs.io/en/latest/api.html
 radon cc -s src/service/NewPersonManagement.py | grep update_customer | awk '{ print $6 }'
+
+# change coupling
+# - Files touched by a commit (merge commits return nothing) 
+git diff-tree --no-commit-id --name-only -r <commit>
+
 
 
 # Code maat
