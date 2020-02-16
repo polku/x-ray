@@ -14,7 +14,7 @@ git log other options
 
 git rev-list
 
-# Nombre de contributeurs
+# Nb of contributors
 git shortlog -s | wc -l
 
 # Comment voir les parties du fichier qui sont les plus modifiées ?
@@ -56,20 +56,21 @@ cloc .  --quiet
 # Split repo yes, but keep history
 https://gbayer.com/development/moving-files-from-one-git-repository-to-another-preserving-history/
 
-
-# Voir l'évolution d'une fonction
+# Complexity evolution
 # We want to analyze snapshots of the repo
 # 1. Identify a relevant commit
 git checkout `git rev-list -1 --before="Jan 01 2016" master --format=oneline | awk '{print $1;}'`
 
 # 2. Analysis
 https://radon.readthedocs.io/en/latest/api.html
+# Global analysis, identify methods to investigate
+radon cc -n F -s . > pb_methods
+# Specific
 radon cc -s src/service/NewPersonManagement.py | grep update_customer | awk '{ print $6 }'
 
 # change coupling
-# - Files touched by a commit (merge commits return nothing) 
+# - Files touched by a commit (merge commits return nothing)
 git diff-tree --no-commit-id --name-only -r <commit>
-
 
 
 # Code maat
