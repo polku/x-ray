@@ -1,0 +1,4 @@
+*.pyc
+env.py
+venv
+*.csv
