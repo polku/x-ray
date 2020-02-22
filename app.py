@@ -65,15 +65,15 @@ def analyze_method(name, filename, commits):
     return res
 
 
-def result_to_csv(commits, filename):
+def result_to_csv(results, filename):
     with open(filename, "w") as f:
         writer = csv.DictWriter(f, fieldnames=("date", "complexity"))
         writer.writeheader()
-        for c in commits:
+        for c in results:
             writer.writerow({"date": c[0].strftime("%Y-%m-%d"), "complexity": c[1]})
 
 
-def make_analysis(func_name, filename):
+def cc_analysis(func_name, filename):
     g.execute(['git', 'checkout', 'master'])
     commits = get_commits()
     results = analyze_method(func_name, filename, commits)
@@ -81,4 +81,28 @@ def make_analysis(func_name, filename):
     g.execute(['git', 'checkout', 'master'])
 
 
-# make_analysis("_update_user", env.REPO_PATH + "/src/service/PersonManagement.py")
+# cc_analysis("_update_user", env.REPO_PATH + "/src/service/PersonManagement.py")
+
+########
+
+def change_coupling_analysis():
+    current_files = set(g.execute(["git", "ls-files"]).split())
+    FILENAME = "/tmp/zz"
+    f = open(FILENAME, "wb")
+    g.execute(["git", "log", "--all", "--oneline"], output_stream=f)
+    f.close()
+    with open(FILENAME) as f:
+        for line in f:
+            if "Merge" in line:
+                continue
+            commit_hash = line.split()[0]
+            files = g.execute(["git", "diff-tree", "--no-commit-id", "--name-only", "-r", "8dec106e46"]).split()
+            files = [f for f in files if f in current_files]
+            files.sort()
+            print(files)
+            return
+
+
+change_coupling_analysis()
+# git diff-tree --no-commit-id --name-only -r <commit>
+# git cat-file -p <commit> | grep parent

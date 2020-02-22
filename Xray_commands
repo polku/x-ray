@@ -72,6 +72,9 @@ radon cc -s src/service/NewPersonManagement.py | grep update_customer | awk '{ p
 # - Files touched by a commit (merge commits return nothing)
 git diff-tree --no-commit-id --name-only -r <commit>
 
+# Find if a commit is a merge, if more than one line
+git cat-file -p <commit> | grep parent
+
 
 # Code maat
 
