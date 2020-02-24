@@ -1,7 +1,9 @@
 # coding: utf-8
 
 import csv
+from collections import defaultdict
 from datetime import date
+from pprint import pprint
 
 import radon
 from dateutil import relativedelta
@@ -85,24 +87,32 @@ def cc_analysis(func_name, filename):
 
 ########
 
-def change_coupling_analysis():
-    current_files = set(g.execute(["git", "ls-files"]).split())
+def change_coupling_analysis(filename):
+    """Get files commonly changed in the same commits
+    """
     FILENAME = "/tmp/zz"
     f = open(FILENAME, "wb")
-    g.execute(["git", "log", "--all", "--oneline"], output_stream=f)
+    g.execute(["git", "log", "--follow", "--oneline", "--", filename], output_stream=f)
     f.close()
+    coupled_files = defaultdict(int)
+    nb_commits = 0
     with open(FILENAME) as f:
-        for line in f:
+        for line in tqdm(f):
             if "Merge" in line:
                 continue
+            nb_commits += 1
             commit_hash = line.split()[0]
-            files = g.execute(["git", "diff-tree", "--no-commit-id", "--name-only", "-r", "8dec106e46"]).split()
-            files = [f for f in files if f in current_files]
-            files.sort()
-            print(files)
-            return
+            files = g.execute(["git", "diff-tree", "--no-commit-id", "--name-only", "-r", commit_hash]).split()
+            for file in files:
+                coupled_files[file] += 1
+    return nb_commits, {k: v for k, v in sorted(coupled_files.items(), key=lambda item: item[1], reverse=True)}
 
 
-change_coupling_analysis()
-# git diff-tree --no-commit-id --name-only -r <commit>
+n, c = change_coupling_analysis("src/cloud_vlan/service/internal/CloudVlanController.py")
+print(n)
+for f in c:
+    pt = c[f] * 100 / n
+    if pt > 15:
+        print(f, pt)
+
 # git cat-file -p <commit> | grep parent
