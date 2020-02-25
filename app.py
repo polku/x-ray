@@ -87,7 +87,7 @@ def cc_analysis(func_name, filename):
 
 ########
 
-def change_coupling_analysis(filename):
+def change_coupling_analysis(filename, file_mapping={}):
     """Get files commonly changed in the same commits
     """
     FILENAME = "/tmp/zz"
@@ -104,15 +104,43 @@ def change_coupling_analysis(filename):
             commit_hash = line.split()[0]
             files = g.execute(["git", "diff-tree", "--no-commit-id", "--name-only", "-r", commit_hash]).split()
             for file in files:
+                file = file_mapping.get(file, file)
                 coupled_files[file] += 1
     return nb_commits, {k: v for k, v in sorted(coupled_files.items(), key=lambda item: item[1], reverse=True)}
 
 
-n, c = change_coupling_analysis("src/cloud_vlan/service/internal/CloudVlanController.py")
+def get_filenames_mapping():
+    """If a file has been renamed, returns a mapping old_name => new_name,
+    to use in further analysis
+    use git blame -C for that, ... I tried, it doesn't works as it is
+    """
+    current_files = g.execute(["git", "ls-files"]).split("\n")
+    mapping = {}
+    current_files = [f for f in current_files if f.endswith(".py")]
+    for file in tqdm(current_files):
+        lines = g.execute(["git", "blame", "-C", file]).split("\n")
+        names = set()
+        for l in lines:
+            try:
+                line_element = l.split()[1]
+            except IndexError:
+                continue
+            if not line_element.startswith("("):  # If file has not been renamed, it's author name and starts with (
+                names.add(line_element)
+        for n in names:
+            if n != file:
+                mapping[n] = file
+    return mapping
+
+
+# mapping = get_filenames_mapping()
+n, c = change_coupling_analysis("api/clouddc/views.py")
 print(n)
 for f in c:
     pt = c[f] * 100 / n
     if pt > 15:
         print(f, pt)
 
+
 # git cat-file -p <commit> | grep parent
+
