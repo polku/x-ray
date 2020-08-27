@@ -87,3 +87,52 @@ docker run -v /home/jmaurice/code/code-maat:/data -it code_maat -l /data/git.log
 
 Analysis :
 abs-churn, age, author-churn, authors, communication, coupling, entity-churn, entity-effort, entity-ownership, fragmentation, identity, main-dev, main-dev-by-revs, messages, refactoring-main-dev, revisions, soc, summary
+
+
+
+
+
+
+code-forensics (https://github.com/smontanari/code-forensics)
+---------------
+
+create gulpfile.js
+
+require('code-forensics').configure(
+  {
+    repository: {
+        rootPath: "/home/jmaurice/airdrum/",
+        excludePaths: ["airdrum-static", "back_env", "htmlcov", "static"]
+    }
+  }
+);
+
+
+gulp webserver
+
+* sloc-trend-analysis                 : Analyse the sloc trend in time for a particular file
+* sum-of-coupling-analysis            : Analyse the sum of coupling for each file
+* temporal-coupling-analysis          : Analyse the evolution of coupling in time for a particular file
+* hotspot-analysis                    : Analyse the complexity and churn of source code to identify hotspots
+* commit-message-analysis             : Analyse the number of occurrencies of commit message words
+* developer-effort-analysis           : Analyse the distribution of effort (revisions) amongst developers/teams
+* developer-coupling-analysis         : Analyse the ownership and communication coupling between developers
+* knowledge-map-analysis              : Analyse the distribution of knowledge amongst developers/teams for each file
+
+
+bugged
+* system-evolution-analysis           : Analyse the evolution and the coupling in time of different parts of your system
+* javascript-complexity-trend-analysis: Analyse the complexity trend in time for a particular javascript file
+* ruby-complexity-trend-analysis      : Analyse the complexity trend in time for a particular ruby file
+
+
+gulp system-evolution-analysis --dateFrom='2019-06-14' --dateTo='2020-06-14' [--targetFile=...]
+
+
+git log --format=format: --name-only --since=12.month \
+ | egrep -v '^$' \
+ | sort \
+ | uniq -c \
+ | sort -nr \
+ | head -50
+
